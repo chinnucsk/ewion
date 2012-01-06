@@ -110,7 +110,7 @@ Return for example: "/test/path" = ["test", "path"]
 
 #TESTS
 
-Ewion Test servers: <http://hg.8protons.com/ewion_test>
+Ewion Test servers: <https://github.com/8Protons/ewion_test>
 
 # Example
 
