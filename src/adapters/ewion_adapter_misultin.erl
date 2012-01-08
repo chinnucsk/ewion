@@ -11,8 +11,6 @@ handle_http(Req, ConfigModule) ->
     %% Get Host for routing
     Host = list_to_binary(ewion_h:gv('Host', Req:get(headers))),
 
-    io:format("~p", [Host]),
-
     %% Get module to call for routing
     Module = ewion_h:gv(module, erlang:apply(ConfigModule, get_config, [Host])),
 
