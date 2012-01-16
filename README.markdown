@@ -132,9 +132,9 @@ Ewion Test servers: <https://github.com/8Protons/ewion_test>
 Handle function:
 
     handle(Pid, 'GET', ["test", "path"], _, _) ->
-        Pid ! {200, [{'Content-Type', <<"text/html">>}], "Ok! Super-Duper"};
+        Pid ! {200, [{'Content-Type', <<"text/html">>}], <<"Ok! Super-Duper">>};
 
 or
 
     handle(Pid, 'GET', ["test", "path"], _, _) ->
-        Pid ! ewion:ok("Ok! Super-Duper");
+        Pid ! ewion:ok(<<"Ok! Super-Duper">>);
