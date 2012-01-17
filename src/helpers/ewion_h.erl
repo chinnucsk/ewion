@@ -4,7 +4,10 @@
 -export([resource/1]).
 
 %% Data Helpers
--export([gv/2, gv/3, string_kv_to_binary_kv/1, string_kv_to_binary_kv/2]).
+-export([gv/2, gv/3]).
+
+%% Data Adapters
+-export([headers_adapter/1, proplists_adapter/1]).
 
 %% ===================================================================
 %% Rest
@@ -32,20 +35,38 @@ gv(Key, List, Default) ->
     end.
 
 %% ===================================================================
-%% Proplist to binary
+%% Headers Adapter
 %% ===================================================================
-string_kv_to_binary_kv([]) ->
+headers_adapter([]) ->
     [];
-string_kv_to_binary_kv(List) ->
-    string_kv_to_binary_kv(List, []).
+headers_adapter(List) ->
+    [{to_atom(Key), to_binary(Value)} || {Key, Value} <- List].
 
-string_kv_to_binary_kv([{K, V}|T], Acc) ->
-    string_kv_to_binary_kv(T, [{cast_value(K), cast_value(V)} | Acc]);
+%% ===================================================================
+%% Headers Adapter
+%% ===================================================================
+proplists_adapter([]) ->
+    [];
+proplists_adapter(List) ->
+    [{to_binary(Key), to_binary(Value)} || {Key, Value} <- List].
 
-string_kv_to_binary_kv([], Acc) ->
-    Acc.
-
-cast_value(Value) when is_atom(Value) ->
+%% ===================================================================
+%% to_ helpers
+%% ===================================================================
+to_atom(Value) when is_atom(Value) ->
     Value;
-cast_value(Value) when is_list(Value) ->
-    list_to_binary(Value).
+to_atom(Value) when is_list(Value) ->
+    list_to_atom(Value);
+to_atom(Value) when is_binary(Value) ->
+    binary_to_atom(Value, latin1);
+to_atom(_Value) ->
+    undefined.
+
+to_binary(Value) when is_binary(Value) ->
+    Value;
+to_binary(Value) when is_atom(Value) ->
+    atom_to_binary(Value, latin1);
+to_binary(Value) when is_list(Value) ->
+    list_to_binary(Value);
+to_binary(_Value) ->
+    <<"">>.

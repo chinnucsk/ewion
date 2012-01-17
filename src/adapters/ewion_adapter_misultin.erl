@@ -30,9 +30,9 @@ get_env(Req) ->
     [
         {method, Method},
         {path, element(2, Req:get(uri))},
-        {args, ewion_h:string_kv_to_binary_kv(get_req_args(Method, Req))},
-        {cookies, ewion_h:string_kv_to_binary_kv(Req:get_cookies())},
-        {headers, ewion_h:string_kv_to_binary_kv(Req:get(headers))}
+        {args, ewion_h:proplists_adapter(get_req_args(Method, Req))},
+        {cookies, ewion_h:proplists_adapter(Req:get_cookies())},
+        {headers, ewion_h:headers_adapter(Req:get(headers))}
     ].
 
 get_req_args('GET', Req) ->
