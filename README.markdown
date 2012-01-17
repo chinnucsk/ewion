@@ -62,31 +62,47 @@ __headers__ = proplists({atom(), binary()})
     {cookies, [{<<"test_cookie">>, <<"1">>}]},
     {headers, [{'Host', <<"127.0.0.1">>}]}
 
-You must send to Pid response in format:
+You must return response in format:
 
     {Status, Headers, Data}
 
 or
+    chunked
 
-    {chunk, {Status, Headers, Data}} for chunked response. Look at source.
+In case of "chunked" you can send messages to Pid in format
 
+    {chunk, {Status, Headers, Data}} %% Start chunked response
+    {chunk, Data} %% Send data to open socket
+    {end_chunk, Data} %% Send last chunk and end response
 
-You also can use __ok__ function from ewion module:
+#Response Helpers
+
+In module ewion we have next functions:
+
+##__ok__
 
 __Data__ = list()
 
-    ok(Data)
+    ewion:ok(Data)
 
 Return {200, [{'Content-Type', <<"text/html">>}], Data}.
 
-with headers:
+##__ok__ with headers:
 
 __Headers__ = proplist({atom(), binary()})
 __Data__ = list()
 
-    ok(Headers, Data)
+    ewion:ok(Headers, Data)
 
 Return {200, [{'Content-Type', <<"text/html">>}|Headers], Data}.
+
+##__redirect__
+
+__url__ = binary()
+
+    ewion:redirect(Url)
+
+Redirect to url
 
 #Behaviours
 

@@ -2,7 +2,7 @@
 
 -behaviour(ewion_behaviour_adapter).
 
--export([handle_http/2, handle_response/1, handle_chunked_response/1, get_env/1]).
+-export([handle_http/2, handle_chunked_response/1, get_env/1]).
 
 %% ===================================================================
 %% HTTP Handler
@@ -25,9 +25,13 @@ handle_http(Req, ConfigModule) ->
     %% Get Environment
     Env = get_env(Req),
 
-    %% Call
-    spawn(Module, handle_request, [self(), Env]),
-    handle_response(Req).
+    case erlang:apply(Module, handle_request, [self(), Env]) of
+        chunked ->
+            handle_chunked_response(Req);
+
+        {Status, Headers, Data} ->
+            cowboy_http_req:reply(Status, Headers, Data, Req)        
+    end.
 
 get_env(Req) ->
     [
@@ -39,21 +43,15 @@ get_env(Req) ->
     ].
 
 %% ===================================================================
-%% Handle Response
+%% Handle Chunked Response
 %% ===================================================================
-handle_response(Req) ->
+handle_chunked_response(Req) ->
     receive
         {chunk, {Status, Headers, Data}} ->
             cowboy_http_req:chunked_reply(Status, Headers, Req),
             cowboy_http_req:chunk(Data),
             handle_chunked_response(Req);
 
-        {Status, Headers, Data} ->
-            cowboy_http_req:reply(Status, Headers, Data, Req)
-    end.
-
-handle_chunked_response(Req) ->
-    receive
         {chunk, Data} ->
             cowboy_http_req:chunk(Data),
             handle_chunked_response(Req);

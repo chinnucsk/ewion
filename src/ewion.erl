@@ -3,7 +3,7 @@
 -export([handle_http/2]).
 
 %% Response Helpers
--export([ok/1, ok/2]).
+-export([ok/1, ok/2, redirect/1]).
 
 %% ===================================================================
 %% HTTP Handler
@@ -22,3 +22,6 @@ ok(Data) ->
 
 ok(Headers, Data) ->
     {200, [{'Content-Type', <<"text/html">>}|Headers], Data}.
+
+redirect(Url) ->
+	{302, [{'Location', Url}], <<"">>}.
