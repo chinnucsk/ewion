@@ -12,12 +12,12 @@ handle_http(Req, ConfigModule) ->
     Host = list_to_binary(ewion_h:gv('Host', Req:get(headers))),
 
     %% Get module to call for routing
-    Module = ewion_h:gv(module, erlang:apply(ConfigModule, get_config, [Host])),
+    {Module, Node} = erlang:apply(ConfigModule, get_request_handler, [Host]),
 
     %% Get Environment
     Env = get_env(Req),
 
-    case erlang:apply(Module, handle_request, [self(), Env]) of
+    case rpc:call(Node, Module, handle_request, [{self(), node()}, Env]) of
         chunked ->
             handle_chunked_response(Req);
 
