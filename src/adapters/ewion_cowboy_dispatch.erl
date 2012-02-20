@@ -8,8 +8,8 @@ init({_Any, http}, Req, Opts) ->
     [ConfigModule|_] = Opts,
 	{ok, Req, ConfigModule}.
 
-handle(Req, ConfigModule) ->
-    ewion_adapter_cowboy:handle_http(Req, ConfigModule).
+handle(Req, State) ->
+    ewion_adapter_cowboy:handle_http(Req, State).    
 
 terminate(_Req, _State) ->
 	ok.

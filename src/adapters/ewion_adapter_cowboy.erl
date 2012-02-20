@@ -30,7 +30,8 @@ handle_http(Req, ConfigModule) ->
             handle_chunked_response(Req);
 
         {Status, Headers, Data} ->
-            cowboy_http_req:reply(Status, Headers, Data, Req)        
+            {ok, Req2} = cowboy_http_req:reply(Status, Headers, Data, Req),
+            {ok, Req2, ConfigModule}
     end.
 
 get_env(Req) ->
