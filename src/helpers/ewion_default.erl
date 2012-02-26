@@ -6,4 +6,4 @@
 
 handle_request(_Pid, Env) ->
     Headers = ewion_h:gv(headers, Env),
-    ewion:ok("Config not found for host: " ++ binary_to_list(ewion_h:gv('Host', Headers))).
+    {ok, ewion:ok("Config not found for host: " ++ binary_to_list(ewion_h:gv('Host', Headers)))}.

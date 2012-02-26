@@ -18,10 +18,10 @@ handle_http(Req, ConfigModule) ->
     Env = get_env(Req),
 
     case rpc:call(Node, Module, handle_request, [{self(), node()}, Env]) of
-        chunked ->
+        {response, chunked} ->
             handle_chunked_response(Req);
 
-        {Status, Headers, Data} ->
+        {response, {Status, Headers, Data}} ->
             Req:respond(Status, Headers, Data)
     end.
 
