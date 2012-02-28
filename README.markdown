@@ -28,16 +28,16 @@ It returns what servers expected. For example, misultin expects fun() and cowboy
 
 __Host__ = binary()
 
-    get_config(Host)
+    get_request_handler(Host)
 
 For example:
 
-    get_config(<<"127.0.0.1">>) ->
-        [{module, test_handler}];
+    get_request_handler(<<"127.0.0.1">>) ->
+        {test_module, node()};
 
     %%Optional
     get_config(_Host) ->
-        [{module, ewion_default}].
+        {ewion_default, node()}.
 
 It takes **Module** and call handle_request function:
 
@@ -51,23 +51,23 @@ __Env__ = proplist()
 Examples Env:
 
 __method__ = atom()  
-__path__ = list()  
+__path__ = binary()  
 __args__ = proplist({binary(), binary()})  
 __cookies__ = proplist({binary(), binary()})  
 __headers__ = proplists({atom(), binary()})
 
     {method, 'GET'},
-    {path, "/test/path"},
+    {path, <<"/test/path">>},
     {args, []},
     {cookies, [{<<"test_cookie">>, <<"1">>}]},
     {headers, [{'Host', <<"127.0.0.1">>}]}
 
 You must return response in format:
 
-    {Status, Headers, Data}
+    {response, {Status, Headers, Data}}
 
 or
-    chunked
+    {chunked}
 
 In case of "chunked" you can send messages to Pid in format
 
@@ -122,7 +122,7 @@ __Url__ = list()
 
     resource(Url)
 
-Return for example: "/test/path" = ["test", "path"]
+Return for example: <<"/test/path">> = [<<"test">>, <<"path">>]
 
 #TESTS
 
@@ -147,10 +147,10 @@ Ewion Test servers: <https://github.com/8Protons/ewion_test>
 
 Handle function:
 
-    handle(Pid, 'GET', ["test", "path"], _, _) ->
-        Pid ! {200, [{'Content-Type', <<"text/html">>}], <<"Ok! Super-Duper">>};
+    handle(Pid, 'GET', [<<"test">>, <<"path">>], _, _) ->
+        {response, {200, [{'Content-Type', <<"text/html">>}], <<"Ok! Super-Duper">>}};
 
 or
 
-    handle(Pid, 'GET', ["test", "path"], _, _) ->
-        Pid ! ewion:ok(<<"Ok! Super-Duper">>);
+    handle(Pid, 'GET', [<<"test">>, <<"path">>], _, _) ->
+        {response, ewion:ok(<<"Ok! Super-Duper">>)};

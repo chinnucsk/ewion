@@ -12,8 +12,11 @@
 %% ===================================================================
 %% Rest
 %% ===================================================================
-resource(Url) ->
-	string:tokens(string:to_lower(Url), "/").
+resource(Url) when is_list(Url) ->
+    resource(list_to_binary(Url));
+
+resource(Url) when is_binary(Url) ->
+    binary:split(binary:replace(Url, <<"/">>, <<"">>), <<"/">>, [global, trim]).
 
 %% ===================================================================
 %% Get Value (GV)
