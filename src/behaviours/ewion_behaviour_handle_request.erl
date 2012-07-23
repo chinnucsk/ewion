@@ -3,7 +3,7 @@
 -export([behaviour_info/1]).
 
 behaviour_info(callbacks) ->
-    [{handle_request,2}, {handle_error,3}];
+    [{handle_request,1}, {handle_error,3}];
     
 behaviour_info(_Other) ->
     undefined.

@@ -17,16 +17,16 @@ handle_http(Req, ConfigModule) ->
     %% Get Environment
     Env = get_env(Req),
 
-    case rpc:call(Node, Module, handle_request, [{self(), node()}, Env]) of
+    case rpc:call(Node, Module, handle_request, [[{pid, {self(), node()}}|Env]]) of
         {chunked} ->
             handle_chunked_response(Req);
 
-        {response, Res} ->
+        {res, Res} ->
             handle_response(Req, Res);
 
         {badrpc, Stack} ->
             case rpc:call(Node, Module, handle_error, [{self(), node()}, Env, Stack]) of
-                {response, Res} ->
+                {res, Res} ->
                     handle_response(Req, Res)
             end   
     end.
