@@ -3,7 +3,7 @@
 -export([handle_http/2]).
 
 %% Response Helpers
--export([ok/1, ok/2, redirect/1]).
+-export([html/1, html/2, redirect/1]).
 
 %% ===================================================================
 %% HTTP Handler
@@ -17,11 +17,11 @@ handle_http(misultin, ConfigModule) ->
 %% ===================================================================
 %% Response helpers
 %% ===================================================================
-ok(Data) ->
-    {200, [{'Content-Type', <<"text/html">>}], Data}.
+html(Data) ->
+    {response, {200, [{'Content-Type', <<"text/html">>}], Data}}.
 
-ok(Headers, Data) ->
-    {200, [{'Content-Type', <<"text/html">>}|Headers], Data}.
+html(Headers, Data) ->
+    {response, {200, [{'Content-Type', <<"text/html">>}|Headers], Data}}.
 
 redirect(Url) ->
-	{302, [{'Location', Url}], <<"">>}.
+    {response, {302, [{'Location', Url}], <<"">>}}.

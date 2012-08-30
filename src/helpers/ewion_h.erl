@@ -6,6 +6,9 @@
 %% Data Helpers
 -export([gv/2, gv/3]).
 
+%% Atom Helpers
+-export([lowercase/1]).
+
 %% Data Adapters
 -export([headers_adapter/1, proplists_adapter/1]).
 
@@ -13,10 +16,14 @@
 %% Rest
 %% ===================================================================
 resource(Url) when is_list(Url) ->
-    resource(list_to_binary(Url));
+  Tokens = string:tokens(string:to_lower(Url), "/"),
+  [list_to_binary(Elem) || Elem <- Tokens];
 
 resource(Url) when is_binary(Url) ->
-    binary:split(binary:replace(Url, <<"/">>, <<"">>), <<"/">>, [global, trim]).
+  resource(binary_to_list(Url));
+
+resource(_) ->
+  [].
 
 %% ===================================================================
 %% Get Value (GV)
@@ -36,6 +43,12 @@ gv(Key, List, Default) ->
         _ ->
             Default
     end.
+
+%% ===================================================================
+%% Atom to lowercase
+%% ===================================================================
+lowercase(Value) when is_atom(Value) ->
+  list_to_atom(string:to_lower(atom_to_list(Value))).
 
 %% ===================================================================
 %% Headers Adapter

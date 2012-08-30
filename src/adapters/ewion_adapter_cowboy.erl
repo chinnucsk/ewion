@@ -25,17 +25,20 @@ handle_http(Req, ConfigModule) ->
     %% Get Environment
     Env = get_env(Req),
 
-    case rpc:call(Node, Module, handle_request, [[{pid, {self(), node()}}|Env]]) of
+    case rpc:call(Node, Module, handle_request, [ [{pid, {self(), node()}}|Env] ]) of
         {chunked} ->
             handle_chunked_response(Req);
 
-        {res, Res} ->
+        {response, Res} ->
             handle_response(Req, ConfigModule, Res);
     
         {badrpc, Stack} ->
-            case rpc:call(Node, Module, handle_error, [{self(), node()}, Env, Stack]) of
-                {res, Res} ->
-                    handle_response(Req, ConfigModule, Res)
+            case rpc:call(Node, Module, handle_error, [[{pid, {self(), node()}}|Env], Stack]) of
+                {response, Res} ->
+                    handle_response(Req, ConfigModule, Res);
+
+                {badrpc, _Stack2} ->
+                    handle_response(Req, ConfigModule, ewion:ok("General server error"))
             end            
     end.
 
@@ -46,11 +49,11 @@ handle_response(Req, State, {Status, Headers, Data}) ->
 get_env(Req) ->
     Method = element(1, cowboy_http_req:method(Req)),    
     [
-        {method, element(1, cowboy_http_req:method(Req))},
+        {method, ewion_h:lowercase(element(1, cowboy_http_req:method(Req)))},
         {path, element(1, cowboy_http_req:raw_path(Req))},
         {args, get_req_args(Method, Req)},
         {cookies, element(1, cowboy_http_req:cookies(Req))},
-        {headers, element(1, cowboy_http_req:headers(Req))}
+        {headers, ewion_h:headers_adapter( element(1, cowboy_http_req:headers(Req)) )}
     ].
 
 get_req_args('GET', Req) ->
